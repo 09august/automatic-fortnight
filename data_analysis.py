@@ -33,7 +33,7 @@ def likeness_df(keywords : list, csv_file = 'Courses.csv'):
     keywords_embedding = np.mean([embedding.embedding for embedding in keywords_embedding_response.data], axis=0)
     
     #To save tokens, only embed courses once
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv(csv_file, encoding='utf-8')
     df = df.groupby(list(df.columns[:-1]))['Profile'].agg(list).reset_index()
     df['Likeness'] = df.apply(likeness, keywords_embedding = keywords_embedding,axis = 1)
     df = df.explode('Profile').reset_index(drop=True)
@@ -43,7 +43,7 @@ def plot_courses_to_likeness(keywords : list, df : pd.DataFrame, csv_file = 'Cou
     if bool(df.empty):
         df = likeness_df(keywords, csv_file)
         
-    df.groupby('Profile').plot(kind = 'scatter', x = 'CourseCode', y = 'Likeness', title = 'Profile')
+    df.groupby('Profile').apply(lambda x: x.plot(kind='scatter', x='CourseCode', y='Likeness', title=x.name))
     plt.show()
     
 

@@ -1,9 +1,8 @@
 import web_scraping
 import data_analysis
 import openai
-import sys
 
-openai.api_key = ''
+openai.api_key = '' #Insert your API key here
 studyplan_document = 'document.pdf'
 
 
@@ -30,9 +29,7 @@ print('Please wait...')
 web_scraping.write_to_csv(studyplan_document)
 keywords = input('Write all your keywords with "," as a separator: ').split(',')
 print('Please wait...')
-df = data_analysis.likeness_df(keywords)
-
-
+df = data_analysis.likeness_df(keywords, 'Courses.csv')
 commands = {'help': help, 'advice' : advice, 'courses': courses, 'profile' : profile,}
 
 while True:

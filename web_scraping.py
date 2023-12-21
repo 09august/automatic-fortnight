@@ -89,7 +89,7 @@ def write_to_csv(study_plan = 'document.pdf', csv_file = 'Courses.csv'):
     try:
         reader = PyPDF2.PdfReader(study_plan)
         doc = list(itertools.chain.from_iterable([page.extract_text().split('\n') for page in reader.pages]))
-        file_handler = open(csv_file, 'w', encoding='UTF8')
+        file_handler = open(csv_file, 'w', encoding='utf-8')
         writer = csv.writer(file_handler)
         writer.writerow(header)
     except Exception as e:
