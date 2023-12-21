@@ -24,7 +24,7 @@ def likeness(row, keywords_embedding):
         print(f"An error occurred: {e} on row {row}")
         return None
     
-def likeness_df(keywords, csv_file = 'Courses.csv'):
+def likeness_df(keywords : list, csv_file = 'Courses.csv'):
     keywords_embedding_response = openai.embeddings.create(
     input = keywords,
     model = "text-embedding-ada-002"
@@ -39,17 +39,17 @@ def likeness_df(keywords, csv_file = 'Courses.csv'):
     df = df.explode('Profile').reset_index(drop=True)
     return df
 
-def plot_courses_to_likeness(keywords, csv_file = 'Courses.csv', df = None):
-    if df == None:
+def plot_courses_to_likeness(keywords : list, df : pd.DataFrame, csv_file = 'Courses.csv'):
+    if bool(df.empty):
         df = likeness_df(keywords, csv_file)
         
-    df.groupby('Profile').plot(kind = 'scatter', x = 'CourseCode', y = 'Likeness')
+    df.groupby('Profile').plot(kind = 'scatter', x = 'CourseCode', y = 'Likeness', title = 'Profile')
     plt.show()
     
 
 
-def return_most_alike_courses(keywords, csv_file = 'Courses.csv', df = None):
-    if df == None:
+def profile_most_alike_courses(keywords : list, df : pd.DataFrame, csv_file = 'Courses.csv'):
+    if bool(df.empty):
         df = likeness_df(keywords, csv_file)
     
     df = df.drop(['CourseContent', 'CourseGoals'], axis = 1)
@@ -81,11 +81,11 @@ def return_most_alike_courses(keywords, csv_file = 'Courses.csv', df = None):
         myDic[case[0]] = o_courses
     return myDic
     
-def plot_for_profile(keywords, csv_file = 'Courses.csv', df = None):
-    if df == None:
+def plot_for_profile(keywords : list, df : pd.DataFrame, csv_file = 'Courses.csv'):
+    if bool(df.empty):
         df = likeness_df(keywords, csv_file)
 
-    myDic = return_most_alike_courses(keywords, csv_file)
+    myDic = profile_most_alike_courses(keywords, df, csv_file)
     
     #Merge dataframes
     grouped_dfs = defaultdict(list)
@@ -94,9 +94,25 @@ def plot_for_profile(keywords, csv_file = 'Courses.csv', df = None):
         
     merged_dfs = {group: pd.concat(dfs) for group, dfs in grouped_dfs.items()}
     
-    
+    #Plot desired data
     profiles = merged_dfs.keys()
     mean_values = [subdf['Likeness'].mean() for subdf in merged_dfs.values()]
         
     plt.bar(profiles, mean_values)
     plt.show() 
+    
+
+def course_advice(keywords : list, profile : str, df : pd.DataFrame, csv_file = 'Courses.csv'):
+    if bool(df.empty):
+        df = likeness_df(keywords, csv_file)
+    
+    myDic = profile_most_alike_courses(keywords, df, csv_file)
+    
+    if profile not in [values[0] for values in myDic.keys()]:
+        print('Profile does not exist.')
+        return
+        
+    for key in myDic:
+        if key[0] == profile:
+            print(key)
+            print(myDic.get(key))

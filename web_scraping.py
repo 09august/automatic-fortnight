@@ -93,8 +93,8 @@ def write_to_csv(study_plan = 'document.pdf', csv_file = 'Courses.csv'):
         writer = csv.writer(file_handler)
         writer.writerow(header)
     except Exception as e:
-        print('Error occured when initializing.', e)
-        return
+        print('Error occured when initializing.')
+        raise e
     
 
     profile = ""
@@ -108,14 +108,13 @@ def write_to_csv(study_plan = 'document.pdf', csv_file = 'Courses.csv'):
             profile = line[14:]
         elif line[:15] == 'Studieretning :':
             profile = line[16:]
-            
+        
         if bool(re.search(r'^(HØST|VÅR) (\d+)\. år$', line)):
             if line[0] == "V":
                 half = 0
             else: half = 1
             year = int(re.search(r'^(HØST|VÅR) (\d+)\. år$', line).group(2))
             c_course = False
-            print(year)
         elif bool(re.search(r'^Komplement', line)) | c_course:
             c_course = True
             continue
